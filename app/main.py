@@ -1,6 +1,7 @@
 import json
 import time
 import uuid
+import hashlib
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
@@ -137,7 +138,7 @@ def triage_ticket(payload: TriageRequest, request: Request):
     log_record = {
         "timestamp": time.time(),
         "request_id": request_id,
-        "input_text": payload.text,
+        "input_hash": hashlib.sha256(payload.text.encode("utf-8")).hexdigest(),
         "decision": response_payload
     }
     print(json.dumps(log_record))

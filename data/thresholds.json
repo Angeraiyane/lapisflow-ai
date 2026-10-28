@@ -1,7 +1,7 @@
 {
-  "tau_protected": 0.05,
+  "model_artifact": "models/clf_v1.joblib",
+  "tau_protected": 0.0047,
   "tau_confidence": 0.95,
-  "val_auto_coverage": 0.6325178389398572,
-  "val_auto_macro_f1": 0.9948631180594063,
-  "model_artifact": "models/clf_v1.joblib"
+  "selected_on": "validation",
+  "rule_tau_protected": "0.5 x lowest P(protected) among truly protected validation messages"
 }

@@ -1,0 +1,3 @@
+intent,text,predicted,confidence,p_protected
+lost_or_stolen_card,Are you able to guide me to my card's location?,card_management,0.783,0.0196
+lost_or_stolen_card,Are you able to locate my card?,card_management,0.91,0.0093
