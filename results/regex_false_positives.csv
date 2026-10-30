@@ -1,0 +1,22 @@
+intent,text,pattern
+get_physical_card,Can you tell me how to locate my PIN?,\blocate\b
+card_linking,"I want to reactivate my card, I thought I had lost it but I found it.",\b(lost|stolen|stole|missing)\b
+get_physical_card,I cannot locate the card PIN.,\blocate\b
+verify_top_up,I can't find the top-up card verification code.,\b(can't|cannot|can not|cant) find\b
+Refund_not_showing_up,I can't find my refund. Please help.,\b(can't|cannot|can not|cant) find\b
+balance_not_updated_after_cheque_or_cash_deposit,Where is my missing cheque I deposited?,\b(lost|stolen|stole|missing)\b
+transfer_not_received_by_recipient,The recipient can not locate funds.,\blocate\b
+get_physical_card,Where can I locate my PIN at?,\blocate\b
+wrong_amount_of_cash_received,Some cash was missing at ATM.,\b(lost|stolen|stole|missing)\b
+card_arrival,I haven't received my card and am worried it is lost.,\b(lost|stolen|stole|missing)\b
+card_swallowed,The ATM stole my card!,\b(lost|stolen|stole|missing)\b
+verify_top_up,I cannot locate the verification code for my top-up card. Please help me.,\blocate\b
+card_linking,I found my lost card. Am I still able to use it?,\b(lost|stolen|stole|missing)\b
+card_arrival,Is my card lost? I am still waiting for it to be delivered.,\b(lost|stolen|stole|missing)\b
+get_physical_card,How do I locate my PIN now that I have my card?,\blocate\b
+top_up_reverted,"Hi there, I came across a problem with my top up and my money is missing, was there a system error?",\b(lost|stolen|stole|missing)\b
+passcode_forgotten,I can't find my password,\b(can't|cannot|can not|cant) find\b
+card_swallowed,I have a problem!  The ATM stole my card!,\b(lost|stolen|stole|missing)\b
+topping_up_by_card,Where did my top-up go? I can't find it in my wallet,\b(can't|cannot|can not|cant) find\b
+topping_up_by_card,I used my card top-up but all of the money is missing.,\b(lost|stolen|stole|missing)\b
+Refund_not_showing_up,Why am I missing my refund,\b(lost|stolen|stole|missing)\b

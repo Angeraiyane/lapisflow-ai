@@ -1,0 +1,6 @@
+tau_protected,protected_leaked,protected_total,nonprotected_sent_to_human_pct
+0.0047,0,156,20.7
+0.005,0,156,20.0
+0.01,0,156,13.1
+0.02,1,156,8.4
+0.05,1,156,4.5

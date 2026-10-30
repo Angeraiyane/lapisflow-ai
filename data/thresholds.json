@@ -3,5 +3,7 @@
   "tau_protected": 0.0047,
   "tau_confidence": 0.95,
   "selected_on": "validation",
-  "rule_tau_protected": "0.5 x lowest P(protected) among truly protected validation messages"
+  "rule_tau_protected": "0.5 x lowest P(protected) among truly protected validation messages (about 0.0093)",
+  "rule_tau_confidence": "auto-tier accuracy >= 99.4% on validation (0.95 gives 99.48%); rule written after viewing the sweep table",
+  "lexical_guard": "measured 2026-10-29 (44/156 caught), not adopted"
 }
