@@ -1,0 +1,5 @@
+detector,leaks@<= 5% esc,leaks@<= 10% esc,leaks@<= 15% esc,leaks@<= 20% esc,leaks@<= 25% esc
+A multiclass (current),11,7,4,4,3
+B binary word,18,11,5,3,2
+C binary char_wb(2-5),17,9,6,3,3
+D binary word+char,13,5,2,2,1

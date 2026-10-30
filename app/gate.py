@@ -1,9 +1,14 @@
-"""Layer-1 lexical safety guard (deterministic). Patterns are FIXED before measuring.
+"""Layer-1 lexical safety guard (deterministic, runs BEFORE the probability gate).
 
-Do NOT tune these patterns on the validation leaks: that would be fitting the guard to the
-set used to judge it. If you change them after looking at results, say so in your notes.
+HISTORY (29 Oct 2026)
+- v1 patterns (first 7) were fixed BEFORE measuring: caught 44/156 protected, 21/1806 false alarms.
+- The last 4 patterns were added AFTER seeing the validation leaks (Khan: harden the guard).
+  => validation numbers for this guard are no longer an unbiased estimate. The untouched TEST set
+  is the only honest check. Say so in the README and the survey.
 """
 import re
+
+GUARD_VERSION = "lex_v2_11patterns"  # bump when the pattern list changes (stored in every audit row)
 
 LEXICAL_PATTERNS = [
     r"\b(lost|stolen|stole|missing)\b",
@@ -13,6 +18,11 @@ LEXICAL_PATTERNS = [
     r"\bfraud\w*\b",
     r"\bcompromised\b",
     r"\bnot recogni[sz]ed\b",
+    # added after seeing validation leaks (Khan's list):
+    r"\blocation\b",
+    r"\bmisplaced\b",
+    r"\bwhere (is|are) my card\b",
+    r"\b(can't|cannot|can not|cant) see my card\b",
 ]
 
 _COMPILED = [re.compile(p, re.IGNORECASE) for p in LEXICAL_PATTERNS]

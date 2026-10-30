@@ -61,11 +61,16 @@ for tp in [0.0047, 0.005, 0.01, 0.02, 0.05]:
 out = pd.DataFrame(rows)
 out.to_csv("results/regex_plus_gate.csv", index=False)
 print(out.to_string(index=False))
+import json
+with open("data/thresholds.json", encoding="utf-8") as f:
+    tau_cur = json.load(f)["tau_protected"]
+print(f"\n=== 6. WHICH LAYER CATCHES EACH PROTECTED MESSAGE (tau_protected in thresholds.json = {tau_cur}) ===")
+prob = p_prot >= tau_cur
+layers = {"lexical only": int((is_prot & lex & ~prob).sum()),
+          "probability only": int((is_prot & ~lex & prob).sum()),
+          "both": int((is_prot & lex & prob).sum()),
+          "neither (LEAK)": int((is_prot & ~lex & ~prob).sum())}
+for k, v in layers.items():
+    print(f"  {k:18s}: {v}/{n_prot}")
+print(f"  non-protected sent to human at this tau: {100 * (lex | prob)[~is_prot].mean():.1f}%")
 print("\nReminder: 0 leaks on 156 is 'observed zero', not a guarantee (95% upper bound ~ 3/156 = 2%).")
-print("\n=== 5. THRESHOLD RULE APPLIED TO PROTECTED NOT CAUGHT BY THE GUARD ===")
-unc = is_prot & ~lex
-tau_star = float(p_prot[unc].min())
-tau_rec = round(0.5 * tau_star, 4)
-sent = lex | (p_prot >= tau_rec)
-print(f"Protected not caught by guard: {int(unc.sum())} | lowest P(protected): {tau_star:.4f} | recommended tau (half): {tau_rec}")
-print(f"leaked={int((is_prot & ~sent).sum())}/{n_prot} | non-protected sent to human={100 * sent[~is_prot].mean():.1f}%")

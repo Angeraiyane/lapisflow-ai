@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: lapisflow-ai
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"   # TO VERIFY: your model was pickled with local Python 3.14 + scikit-learn 1.9.1
+      # LLM fallback stays OFF unless you add FALLBACK_ENABLED=1, GEMINI_API_KEY, GEMINI_MODEL in the dashboard.

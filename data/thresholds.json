@@ -2,8 +2,8 @@
   "model_artifact": "models/clf_v1.joblib",
   "tau_protected": 0.0047,
   "tau_confidence": 0.95,
-  "selected_on": "validation",
-  "rule_tau_protected": "0.5 x lowest P(protected) among truly protected validation messages (about 0.0093)",
-  "rule_tau_confidence": "auto-tier accuracy >= 99.4% on validation (0.95 gives 99.48%); rule written after viewing the sweep table",
-  "lexical_guard": "measured 2026-10-29 (44/156 caught), not adopted"
+  "selected_on": "validation (tau_confidence); out-of-fold train (tau_protected review, 2026-10-30)",
+  "rule_tau_protected": "0.0047 kept for V1: out-of-fold train gives 3/727 leaks (0.41%, 95% upper bound ~1.06%) at 23.7% escalation; observed zero is not a guarantee; the 'half of the lowest P' rule is unusable (outlier: tau 0.0003 = 66.5% escalation)",
+  "rule_tau_confidence": "auto-tier accuracy >= 99.4% on validation (0.95 gives 99.48%, coverage 59.02%); rule written after viewing the sweep table",
+  "lexical_guard": "ACTIVE in API v0.4.0+, version lex_v2_11patterns; 4 of 11 patterns added after seeing validation leaks, so its validation numbers are optimistic"
 }

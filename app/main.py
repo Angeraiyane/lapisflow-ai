@@ -11,6 +11,8 @@ from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.audit import init_db, log_to_db
+from app.fallback import (SUCCESS, classify_with_fallback, client_from_env, limiter_from_env)
+from app.gate import GUARD_VERSION, check_lexical_gate
 
 MODEL_PATH = "models/clf_v1.joblib"
 THRESHOLDS_PATH = "data/thresholds.json"
@@ -31,6 +33,9 @@ async def lifespan(app: FastAPI):
         app.state.protected_category_index = classes.index(PROTECTED_CATEGORY)
 
         init_db()
+        app.state.llm_client = client_from_env()  # None unless explicitly enabled
+        app.state.limiter = limiter_from_env()
+        print(f"[INFO] LLM fallback {'ENABLED' if app.state.llm_client else 'disabled'}")
         print(f"[INFO] Artifacts loaded. tau_protected={app.state.thresholds['tau_protected']}, "
               f"tau_confidence={app.state.thresholds['tau_confidence']}")
     except Exception as e:
@@ -45,7 +50,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Lapisflow AI - Cascade Triage",
     description="Customer-ticket triage with a protected-intent gate, a confidence gate and an audit log.",
-    version="0.3.0",
+    version="0.5.0",
     lifespan=lifespan,
 )
 
@@ -56,7 +61,7 @@ class TriageRequest(BaseModel):
 
 class TriageResponse(BaseModel):
     request_id: str
-    route: str  # "auto" | "human"
+    route: str  # "auto" | "llm" | "human"
     category: str
     confidence: float
     reason: str
@@ -73,7 +78,7 @@ def health_check():
         "service": "lapisflow-ai",
         "model_loaded": model_ready,
         "thresholds_loaded": thresholds_ready,
-        "version": "0.3.0",
+        "version": "0.5.0",
     }
 
 
@@ -99,15 +104,38 @@ def triage_ticket(payload: TriageRequest, background_tasks: BackgroundTasks, req
     tau_p = thresholds["tau_protected"]
     tau_c = thresholds["tau_confidence"]
 
-    if protected_prob >= tau_p:
+    # Layer 1: deterministic lexical guard. Layer 2: protected probability. Layer 3: confidence.
+    lexical = check_lexical_gate(payload.text)
+    if lexical["triggered"]:
         route = "human"
+        decision_layer = "lexical_gate"
+        reason = f"Lexical safety gate triggered: pattern '{lexical['pattern']}'"
+    elif protected_prob >= tau_p:
+        route = "human"
+        decision_layer = "probability_gate"
         reason = f"Safety policy triggered: protected probability ({protected_prob:.4f}) >= tau_protected ({tau_p:.4f})"
     elif confidence >= tau_c:
         route = "auto"
+        decision_layer = "confidence_gate"
         reason = f"Confidence threshold satisfied ({confidence:.4f} >= tau_confidence ({tau_c:.4f}))"
     else:
         route = "human"
+        decision_layer = "low_confidence"
         reason = f"Low confidence escalation ({confidence:.4f} < tau_confidence ({tau_c:.4f}))"
+
+    # Layer 4: LLM fallback, ONLY for low-confidence cases that no safety layer flagged.
+    fallback_status = "none"
+    llm_client = getattr(request.app.state, "llm_client", None)
+    if decision_layer == "low_confidence" and llm_client is not None:
+        fb = classify_with_fallback(payload.text, llm_client, request.app.state.limiter)
+        fallback_status = fb.status
+        if fb.status == SUCCESS:
+            route = "llm"
+            top_category = fb.category
+            decision_layer = "llm_fallback"
+            reason = f"Low classifier confidence ({confidence:.4f}); category chosen by LLM fallback"
+        else:
+            reason += f" | LLM fallback not used: {fb.status}"
 
     latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
@@ -130,9 +158,14 @@ def triage_ticket(payload: TriageRequest, background_tasks: BackgroundTasks, req
         confidence=confidence,
         protected_prob=protected_prob,
         route=route,
+        decision_layer=decision_layer,
         decision_reason=reason,
         model_version=MODEL_VERSION,
         latency_ms=latency_ms,
+        fallback_status=fallback_status,
+        tau_protected=tau_p,
+        tau_confidence=tau_c,
+        guard_version=GUARD_VERSION,
     )
 
     print(json.dumps({"timestamp": time.time(), "request_id": request_id,

@@ -2,6 +2,7 @@ intent,text,pattern
 get_physical_card,Can you tell me how to locate my PIN?,\blocate\b
 card_linking,"I want to reactivate my card, I thought I had lost it but I found it.",\b(lost|stolen|stole|missing)\b
 get_physical_card,I cannot locate the card PIN.,\blocate\b
+transaction_charged_twice,I was charged multiple times at the same location at the same time,\blocation\b
 verify_top_up,I can't find the top-up card verification code.,\b(can't|cannot|can not|cant) find\b
 Refund_not_showing_up,I can't find my refund. Please help.,\b(can't|cannot|can not|cant) find\b
 balance_not_updated_after_cheque_or_cash_deposit,Where is my missing cheque I deposited?,\b(lost|stolen|stole|missing)\b

@@ -1,0 +1,4 @@
+intent,text,p_protected,confidence
+card_payment_not_recognised,i disagree with a charge,0.0005,0.999
+card_payment_not_recognised,I'm not recognizing the card payment.,0.0022,0.997
+card_payment_not_recognised,Why is there an uknown charge showing on my account?,0.0031,0.991

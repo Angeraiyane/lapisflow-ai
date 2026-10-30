@@ -1,0 +1,8 @@
+intent,text,p_protected,confidence
+card_payment_not_recognised,i disagree with a charge,0.0005,0.999
+direct_debit_payment_not_recognised,what is the matter?,0.0184,0.396
+card_payment_not_recognised,I have a charge for something I didn't buy.,0.0127,0.933
+card_payment_not_recognised,I'm not recognizing the card payment.,0.0022,0.997
+direct_debit_payment_not_recognised,I was charged on my account that shouldn't be there.,0.0173,0.975
+card_payment_not_recognised,This card payment isn't is recognition.,0.0048,0.991
+card_payment_not_recognised,Why is there an uknown charge showing on my account?,0.0031,0.991
