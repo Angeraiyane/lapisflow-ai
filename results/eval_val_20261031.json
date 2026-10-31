@@ -1,0 +1,40 @@
+{
+  "date_utc": "2026-10-31T13:38:06.776776+00:00",
+  "base_url_host": "127.0.0.1:8000",
+  "split": "val",
+  "n_requested": 1962,
+  "n_ok": 1962,
+  "n_errors": 0,
+  "note": "validation split was used to choose thresholds: not an independent test",
+  "route_counts": {
+    "auto": 1145,
+    "llm": 0,
+    "human": 817
+  },
+  "route_pct": {
+    "auto": 58.36,
+    "llm": 0.0,
+    "human": 41.64
+  },
+  "auto_accuracy": 0.9948,
+  "layers_all_requests": {
+    "low_confidence": 287,
+    "confidence_gate": 1145,
+    "lexical_gate": 68,
+    "probability_gate": 462
+  },
+  "layers_protected_messages": {
+    "lexical_gate": 46,
+    "probability_gate": 110
+  },
+  "protected_total": 156,
+  "protected_not_routed_to_human": 0,
+  "protected_leak_pct": 0.0,
+  "client_latency_ms": {
+    "p50": 29.89,
+    "p95": 104.73,
+    "p99": 402.14,
+    "max": 2258.09,
+    "mean": 46.12
+  }
+}
