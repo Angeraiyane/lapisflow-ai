@@ -20,7 +20,11 @@ Six Banking77 intents are **protected**: `card_payment_not_recognised`, `cash_wi
 The goal "leakage near zero for +5–10 % escalation" is not reachable with this model: at 10 % escalation the same analysis gives 7/727 misses (0.96 %). The remaining misses are confident, so a stricter confidence threshold does not catch them.
 
 ## Known failure types (train, out-of-fold, tau 0.0047)
-"i disagree with a charge" (ambiguous label, P(protected) 0.0005, confidence 0.999); "I'm not recognizing the card payment." (variant of a guard pattern); "Why is there an uknown charge showing on my account?" (typo).
+All three are `card_payment_not_recognised`, in the same fold, and **confidently misclassified into a neighbouring category**, so the confidence gate cannot help:
+- "i disagree with a charge" → `fees_charges`, confidence 0.999, P(protected) 0.0005 (ambiguous label);
+- "I'm not recognizing the card payment." → `payments_and_refunds`, 0.997, 0.0022 (variant of a guard pattern);
+- "Why is there an uknown charge showing on my account?" → `fees_charges`, 0.991, 0.0031 (typo).
+Per protected intent: `card_payment_not_recognised` 3/146 (2.05 %, exact two-sided 95 % interval 0.43–5.89 %); the other five 0 observed, upper bounds 2.35–4.25 %.
 
 ## Not covered
 Adversarial inputs, languages other than English, prompt injection against a live LLM (mitigated only by an "untrusted data" instruction in the prompt, tested with a fake client), API authentication, abuse and rate limits, drift. Calibration inside the auto band and per protected intent has not been audited yet.
