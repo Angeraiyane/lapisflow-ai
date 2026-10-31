@@ -42,6 +42,8 @@ For each: **score**, **one-sentence reason**, **one concrete attack or missing t
 9. Coverage 58.36 % at 99.48 % accuracy is reported without selection bias. Where could bias creep in?
 10. Reporting "not zero, observed 0.41 %" is enough to justify shipping this threshold. What standard of evidence would you require?
 
+*Live stress test (10 min, added after Hack's suggestion)*: each reviewer writes 3–5 adversarial messages (a protected intent disguised as a routine request, a routine request that sounds protected, an ambiguous one) in `data/adversarial_cases_template.csv` format (`text,is_protected,category`). I replay them with `python scripts/evaluate_live.py --csv <file>` and we discuss every message that is not routed to a human although it should be. These messages were never used to choose any threshold.
+
 ## 6. Collection template (copy per reviewer)
 | # | Score 1–5 | Reason (1 sentence) | Concrete attack / missing test |
 |---|---|---|---|
