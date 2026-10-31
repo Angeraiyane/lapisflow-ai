@@ -14,6 +14,7 @@ import json
 import os
 import random
 import statistics
+import subprocess
 import sys
 import time
 import urllib.error
@@ -48,6 +49,30 @@ def post(text):
     return out, (time.perf_counter() - t0) * 1000
 
 
+try:
+    from scipy.stats import beta
+except ImportError:  # intervals are skipped if scipy is missing
+    beta = None
+
+
+def cp(k, n):
+    """Exact two-sided 95% (Clopper-Pearson) interval in %, or None."""
+    if beta is None or n == 0:
+        return None
+    lo = 0.0 if k == 0 else beta.ppf(0.025, k, n - k + 1)
+    hi = 1.0 if k == n else beta.ppf(0.975, k + 1, n - k)
+    return [round(100 * lo, 2), round(100 * hi, 2)]
+
+
+def git_info():
+    try:
+        sha = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
+        dirty = bool(subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, check=True).stdout.strip())
+        return {"commit": sha, "uncommitted_changes": dirty}
+    except Exception:
+        return None
+
+
 def layer_of(reason):
     """Decision layer, read from the API's 'reason' text."""
     if reason.startswith("Lexical"):
@@ -74,7 +99,7 @@ for i, row in enumerate(rows, 1):
         errors += 1
         continue
     lat.append(ms)
-    results.append({"route": out["route"], "pred": out["category"], "true": row.get("category") or "", "text_id": i,
+    results.append({"route": out["route"], "pred": out["category"], "true": row.get("category") or "", "intent": row.get("intent") or "", "text_id": i,
                     "protected": str(row["is_protected"]).strip() == "1", "layer": layer_of(out["reason"])})
     if i % 200 == 0:
         print(f"{i}/{len(rows)}", flush=True)
@@ -105,6 +130,14 @@ report = {
     "layers_protected_messages": count_layers(prot),
     "protected_total": len(prot), "protected_not_routed_to_human": len(leaks),
     "protected_leak_pct": round(100 * len(leaks) / len(prot), 2) if prot else None,
+    "protected_leak_ci95_pct": cp(len(leaks), len(prot)),
+    "per_intent_protected": {
+        intent: {"n": sum(1 for x in prot if x["intent"] == intent),
+                 "not_routed_to_human": sum(1 for x in leaks if x["intent"] == intent),
+                 "ci95_pct": cp(sum(1 for x in leaks if x["intent"] == intent), sum(1 for x in prot if x["intent"] == intent))}
+        for intent in sorted({x["intent"] for x in prot if x["intent"]})},
+    "git": git_info(),
+    "thresholds_file": json.load(open("data/thresholds.json", encoding="utf-8")) if os.path.exists("data/thresholds.json") else None,
     "client_latency_ms": {"p50": pct(lat, 50), "p95": pct(lat, 95), "p99": pct(lat, 99), "max": round(max(lat), 2),
                           "mean": round(statistics.mean(lat), 2)},
 }
