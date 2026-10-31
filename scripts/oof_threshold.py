@@ -81,7 +81,9 @@ print(out.to_string(index=False))
 
 for tp in (0.0047, 0.02):
     leak = is_prot & ~(lex | (p_prot >= tp))
-    df = train.loc[leak, ["intent", "text"]].assign(p_protected=p_prot[leak].round(4), confidence=conf[leak].round(3))
+    pred = np.array(classes)[proba.argmax(axis=1)]
+    df = train.loc[leak, ["intent", "text"]].assign(p_protected=p_prot[leak].round(4), confidence=conf[leak].round(3),
+                                                    predicted_category=pred[leak], fold=fold_id[leak])
     df.to_csv(f"results/oof_leaks_tau{tp}.csv", index=False)
     print(f"\nLeaked messages at tau={tp}: {len(df)} (saved to results/oof_leaks_tau{tp}.csv). By intent:")
     print(df["intent"].value_counts().to_string() if len(df) else "  none")
