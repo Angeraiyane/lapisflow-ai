@@ -10,7 +10,7 @@ import uvicorn
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from app.audit import init_db, log_to_db
+from app.audit import get_stats, init_db, log_to_db
 from app.fallback import (SUCCESS, classify_with_fallback, client_from_env, limiter_from_env)
 from app.gate import GUARD_VERSION, check_lexical_gate
 
@@ -80,6 +80,11 @@ def health_check():
         "thresholds_loaded": thresholds_ready,
         "version": "0.5.0",
     }
+
+
+@app.get("/stats")
+def stats():
+    return get_stats()
 
 
 @app.post("/triage", response_model=TriageResponse)

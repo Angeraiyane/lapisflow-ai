@@ -163,3 +163,13 @@ def test_old_audit_db_is_migrated(tmp_path):
         cols = [r[1] for r in conn.execute("PRAGMA table_info(audit_logs)")]
         for c in ("decision_layer", "tau_protected", "tau_confidence", "guard_version"):
             assert c in cols
+
+
+def test_stats_counts_requests_by_route(client):
+    for text in ["How do I top up my account?", "I lost my card"]:
+        client.post("/triage", json={"text": text})
+    time.sleep(0.3)
+    s = client.get("/stats").json()
+    assert s["total_requests"] >= 2
+    assert sum(s["by_route"].values()) == s["total_requests"]
+    assert sum(s["by_decision_layer"].values()) == s["total_requests"]

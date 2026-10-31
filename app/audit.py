@@ -63,3 +63,13 @@ def log_to_db(request_id, input_hash, predicted_category, confidence, protected_
             )
     except Exception as e:  # never crash the API because of the audit log
         print(f"[ERROR] Audit log failed: {e}")
+
+
+def get_stats(db_path: str = DB_PATH) -> dict:
+    """Counts by route and by decision layer since the audit DB was created.
+    On free hosting the disk is ephemeral: counts restart after a restart."""
+    with closing(sqlite3.connect(db_path)) as conn:
+        total, since = conn.execute("SELECT COUNT(*), MIN(timestamp) FROM audit_logs").fetchone()
+        by_route = dict(conn.execute("SELECT route, COUNT(*) FROM audit_logs GROUP BY route"))
+        by_layer = dict(conn.execute("SELECT decision_layer, COUNT(*) FROM audit_logs GROUP BY decision_layer"))
+    return {"total_requests": total, "since": since, "by_route": by_route, "by_decision_layer": by_layer}
