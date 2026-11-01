@@ -24,6 +24,7 @@ All three are `card_payment_not_recognised`, in the same fold, and **confidently
 - "i disagree with a charge" → `fees_charges`, confidence 0.999, P(protected) 0.0005 (ambiguous label);
 - "I'm not recognizing the card payment." → `payments_and_refunds`, 0.997, 0.0022 (variant of a guard pattern);
 - "Why is there an uknown charge showing on my account?" → `fees_charges`, 0.991, 0.0031 (typo).
+Checks (`scripts/fold_check.py`): the fifth fold is not weaker (accuracy 0.936 vs 0.930–0.941), train has no exact duplicate text, and the three misses have different causes (a vague message with no close training example; a correctly labelled paraphrase exists but the word form differs; an "unknown charge" resembling fee questions). The clustering in one fold remains unexplained.
 Per protected intent: `card_payment_not_recognised` 3/146 (2.05 %, exact two-sided 95 % interval 0.43–5.89 %); the other five 0 observed, upper bounds 2.35–4.25 %.
 
 ## Not covered
