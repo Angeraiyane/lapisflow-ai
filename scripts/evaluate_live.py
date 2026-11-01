@@ -99,7 +99,7 @@ for i, row in enumerate(rows, 1):
         errors += 1
         continue
     lat.append(ms)
-    results.append({"request_id": out.get("request_id", ""), "reason": out.get("reason", ""), "conf": out.get("confidence"),
+    results.append({"client_ms": round(ms, 2), "request_id": out.get("request_id", ""), "reason": out.get("reason", ""), "conf": out.get("confidence"),
                     "route": out["route"], "pred": out["category"], "true": row.get("category") or "", "intent": row.get("intent") or "", "text_id": i,
                     "protected": str(row["is_protected"]).strip() == "1", "layer": layer_of(out["reason"])})
     if i % 200 == 0:
@@ -147,9 +147,9 @@ tag0 = ("custom_" + os.path.splitext(os.path.basename(args.csv))[0]) if args.csv
 trace_path = f"results/trace_{tag0}_{datetime.now(timezone.utc):%Y%m%d}.csv"
 with open(trace_path, "w", encoding="utf-8", newline="") as tf:  # no raw text: row index + request_id (join with the audit DB)
     w = csv.writer(tf)
-    w.writerow(["row", "request_id", "intent", "true_category", "is_protected", "pred_category", "confidence", "route", "decision_layer", "reason"])
+    w.writerow(["row", "request_id", "intent", "true_category", "is_protected", "pred_category", "confidence", "route", "decision_layer", "client_ms", "reason"])
     for x in results:
-        w.writerow([x["text_id"], x["request_id"], x["intent"], x["true"], int(x["protected"]), x["pred"], x["conf"], x["route"], x["layer"], x["reason"]])
+        w.writerow([x["text_id"], x["request_id"], x["intent"], x["true"], int(x["protected"]), x["pred"], x["conf"], x["route"], x["layer"], x["client_ms"], x["reason"]])
 tag = ("custom_" + os.path.splitext(os.path.basename(args.csv))[0]) if args.csv else args.split
 path = f"results/eval_{tag}_{datetime.now(timezone.utc):%Y%m%d}.json"
 with open(path, "w", encoding="utf-8") as f:

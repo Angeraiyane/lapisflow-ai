@@ -89,6 +89,7 @@ Banking77 (13,083 messages, 77 intents; CC BY 4.0, Casanueva et al., 2020). Offi
 
 ## Known limitations
 
+- The lexical guard is a deterministic floor, not a detector: on train it catches 219/727 protected messages (30 %) with 1.4 % false alarms. Checked by hand against `lex_v2_11patterns`, it does **not** match "I don't recognise this payment", "There is an unrecognised transaction", "I did not make this payment", "I do not recognize the card payment." or "Someone used my card in another country"; it **does** match "This is not an unauthorized charge, I just want a statement" (negation) and "Where is my card? It was ordered last week" (a delivery question).
 - TF-IDF + logistic regression cannot separate some protected paraphrases from routine messages; a global threshold treats the six protected intents as alike, and the data show they are not (see per-intent table).
 - A comparison on train (out-of-fold) suggests a dedicated binary detector with word + character n-grams may leak less at equal escalation (1–7 leaks, thresholds optimised on the same data): **promising, not proven**.
 - The rule that gave `tau_protected = 0.0047` (half of the lowest validation P(protected)) depends on one extreme message; applied on train it gives 0.0003.
