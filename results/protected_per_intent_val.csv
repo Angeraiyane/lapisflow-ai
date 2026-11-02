@@ -1,0 +1,7 @@
+intent,n_val,sent_to_human_by_gates,caught_by_lexical_guard,model_predicts_protected_category
+card_payment_not_recognised,31,31,1,30
+cash_withdrawal_not_recognised,30,30,4,28
+compromised_card,19,19,8,19
+direct_debit_payment_not_recognised,33,33,1,32
+lost_or_stolen_card,19,19,18,15
+lost_or_stolen_phone,24,24,14,24

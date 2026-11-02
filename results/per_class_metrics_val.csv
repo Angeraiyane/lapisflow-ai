@@ -1,0 +1,14 @@
+,precision,recall,f1-score,support
+account_and_identity,0.9651,0.9727,0.9689,256.0
+atm_cash,1.0,0.9369,0.9674,111.0
+card_management,0.9212,0.947,0.9339,321.0
+fees_charges,0.9693,0.9726,0.9709,292.0
+fx_currency,0.913,0.866,0.8889,97.0
+payments_and_refunds,0.8968,0.9267,0.9115,150.0
+top_up,0.956,0.9053,0.93,264.0
+transfers,0.9032,0.9451,0.9237,237.0
+unauthorized_transactions_security,0.961,0.9487,0.9548,156.0
+virtual_cards,0.9872,0.9872,0.9872,78.0
+accuracy,0.9439,0.9439,0.9439,0.9439
+macro avg,0.9473,0.9408,0.9437,1962.0
+weighted avg,0.9446,0.9439,0.944,1962.0

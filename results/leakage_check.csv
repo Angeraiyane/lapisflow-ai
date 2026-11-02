@@ -1,0 +1,10 @@
+check,count,different_labels
+exact train~val,1,0
+exact train~test,2,0
+exact val~test,2,0
+near val->train >= 0.95,27,2
+near val->train >= 0.9,59,6
+near val->train >= 0.8,192,22
+near test->train+val >= 0.95,25,1
+near test->train+val >= 0.9,71,2
+near test->train+val >= 0.8,214,15

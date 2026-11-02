@@ -1,0 +1,11 @@
+,account_and_identity,atm_cash,card_management,fees_charges,fx_currency,payments_and_refunds,top_up,transfers,unauthorized_transactions_security,virtual_cards
+true:account_and_identity,249,0,5,0,1,0,1,0,0,0
+true:atm_cash,0,104,1,0,0,2,1,2,1,0
+true:card_management,6,0,304,1,1,5,1,0,2,1
+true:fees_charges,0,0,2,284,2,1,1,2,0,0
+true:fx_currency,1,0,2,5,84,3,1,1,0,0
+true:payments_and_refunds,0,0,8,0,0,139,0,2,1,0
+true:top_up,1,0,3,1,1,2,239,16,1,0
+true:transfers,0,0,1,0,3,3,5,224,1,0
+true:unauthorized_transactions_security,1,0,3,2,0,0,1,1,148,0
+true:virtual_cards,0,0,1,0,0,0,0,0,0,77
