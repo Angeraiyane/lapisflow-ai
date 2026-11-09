@@ -173,3 +173,26 @@ def test_stats_counts_requests_by_route(client):
     assert s["total_requests"] >= 2
     assert sum(s["by_route"].values()) == s["total_requests"]
     assert sum(s["by_decision_layer"].values()) == s["total_requests"]
+
+
+def test_concurrent_audit_writes_do_not_fail(tmp_path):
+    import threading
+
+    from app.audit import init_db, log_to_db
+
+    db = str(tmp_path / "concurrent.db")
+    init_db(db)
+    errors = []
+
+    def worker(k):
+        for j in range(40):
+            try:
+                log_to_db(f"id-{k}-{j}", "h", "top_up", 0.99, 0.0, "auto", "confidence_gate", "r", "clf_v1", 1.0, db_path=db)
+            except Exception as e:  # log_to_db swallows errors itself, so also count rows below
+                errors.append(e)
+
+    threads = [threading.Thread(target=worker, args=(k,)) for k in range(8)]
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+    with closing(sqlite3.connect(db)) as conn:
+        assert conn.execute("SELECT COUNT(*) FROM audit_logs").fetchone()[0] == 8 * 40

@@ -92,11 +92,16 @@ def pct(xs, p):
 
 
 results, errors, lat = [], 0, []
+error_samples = []  # (row number, error type, short message): to diagnose failed requests
 for i, row in enumerate(rows, 1):
     try:
         out, ms = post(row["text"])
-    except (urllib.error.URLError, TimeoutError, ValueError):
+    except (urllib.error.URLError, TimeoutError, ValueError) as e:
         errors += 1
+        if len(error_samples) < 10:
+            code = getattr(e, "code", None)
+            error_samples.append({"row": i, "type": type(e).__name__, "http_status": code, "message": str(e)[:120],
+                                  "text_length": len(row["text"])})
         continue
     lat.append(ms)
     results.append({"client_ms": round(ms, 2), "request_id": out.get("request_id", ""), "reason": out.get("reason", ""), "conf": out.get("confidence"),
@@ -122,7 +127,7 @@ def count_layers(items):
 
 report = {
     "date_utc": datetime.now(timezone.utc).isoformat(), "base_url_host": args.base_url.split("//")[-1].split("/")[0],
-    "split": ("custom:" + os.path.basename(args.csv)) if args.csv else args.split, "n_requested": len(rows), "n_ok": n, "n_errors": errors,
+    "split": ("custom:" + os.path.basename(args.csv)) if args.csv else args.split, "n_requested": len(rows), "n_ok": n, "n_errors": errors, "error_samples": error_samples,
     "note": ("custom cases, never used to choose thresholds" if args.csv else
              "validation split was used to choose thresholds: not an independent test" if args.split == "val" else "final test split"),
     "route_counts": by_route, "route_pct": {k: round(100 * v / n, 2) for k, v in by_route.items()},

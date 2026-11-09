@@ -30,11 +30,21 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 """
 
 
+def _connect(db_path: str):
+    """Longer lock wait (30 s) and WAL mode: concurrent background writes are far less likely to fail."""
+    conn = sqlite3.connect(db_path, timeout=30)
+    try:
+        conn.execute("PRAGMA journal_mode=WAL")
+    except sqlite3.Error:
+        pass
+    return conn
+
+
 def init_db(db_path: str = DB_PATH) -> None:
     folder = os.path.dirname(db_path)
     if folder:
         os.makedirs(folder, exist_ok=True)
-    with closing(sqlite3.connect(db_path)) as conn, conn:
+    with closing(_connect(db_path)) as conn, conn:
         conn.execute(SCHEMA)
         # Migration: an audit.db created before the decision_layer column existed
         cols = [r[1] for r in conn.execute("PRAGMA table_info(audit_logs)")]
@@ -50,7 +60,7 @@ def log_to_db(request_id, input_hash, predicted_category, confidence, protected_
               fallback_status="none", tau_protected=None, tau_confidence=None,
               guard_version="unknown", db_path: str = DB_PATH) -> None:
     try:
-        with closing(sqlite3.connect(db_path)) as conn, conn:
+        with closing(_connect(db_path)) as conn, conn:
             conn.execute(
                 "INSERT INTO audit_logs (request_id, timestamp, input_hash, predicted_category, "
                 "confidence, protected_prob, route, decision_layer, decision_reason, model_version, "
@@ -68,7 +78,7 @@ def log_to_db(request_id, input_hash, predicted_category, confidence, protected_
 def get_stats(db_path: str = DB_PATH) -> dict:
     """Counts by route and by decision layer since the audit DB was created.
     On free hosting the disk is ephemeral: counts restart after a restart."""
-    with closing(sqlite3.connect(db_path)) as conn:
+    with closing(_connect(db_path)) as conn:
         total, since = conn.execute("SELECT COUNT(*), MIN(timestamp) FROM audit_logs").fetchone()
         by_route = dict(conn.execute("SELECT route, COUNT(*) FROM audit_logs GROUP BY route"))
         by_layer = dict(conn.execute("SELECT decision_layer, COUNT(*) FROM audit_logs GROUP BY decision_layer"))
