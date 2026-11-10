@@ -46,6 +46,110 @@ All three misses are in one intent, all in the same fold (the fifth of five), an
 
 The goal "near-zero leakage for +5–10 % escalation" is **not achievable with TF-IDF + logistic regression on this data**: observed zero misses out-of-fold needs `tau_protected` ≈ 0.0003, i.e. 66.5 % escalation. See `SAFETY_CASE.md`.
 
+## Nested Cross-Validation: Detector Comparison
+
+A nested cross-validation experiment compares two protected-message detection strategies using the combined training and validation data.
+
+**Experimental setup:**
+- Dataset: train + validation (11,120 messages).
+- Protected messages: 883.
+- Outer cross-validation: 5 folds.
+- Inner cross-validation: 3 folds.
+- Test split: **NOT USED**.
+- Evaluation budgets: 10%, 15%, and 20% escalation.
+
+**Compared detectors:**
+- **A — Multiclass (current):** the existing multiclass classifier and protected-probability detection strategy.
+- **D — Binary word + char:** a dedicated binary detector using word and character features.
+
+### Full Nested CV Results
+
+| Detector | Budget | Protected missed | Miss rate | 95% CI | Real escalation |
+|---|---:|---:|---:|---:|---:|
+| A | 10% | 6/883 | 0.68% | 0.25–1.47% | 8.2% |
+| A | 15% | 3/883 | 0.34% | 0.07–0.99% | 12.2% |
+| A | 20% | 3/883 | 0.34% | 0.07–0.99% | 15.9% |
+| D | 10% | 8/883 | 0.91% | 0.39–1.78% | 8.6% |
+| D | 15% | 4/883 | 0.45% | 0.12–1.16% | 13.0% |
+| D | 20% | 2/883 | 0.23% | 0.03–0.82% | 16.7% |
+
+### Paired Statistical Comparison
+
+An exact paired sign test compares messages missed by only one detector.
+
+| Budget | Missed only by A | Missed only by D | p-value |
+|---|---:|---:|---:|
+| 10% | 4 | 6 | 0.754 |
+| 15% | 2 | 3 | 1.000 |
+| 20% | 3 | 2 | 1.000 |
+
+No statistically significant difference was detected between the two approaches.
+
+Detector D has fewer missed protected messages at the 20% budget, but this difference is not statistically significant.
+
+**Interpretation:** The dedicated binary word + character detector is promising, particularly at higher escalation budgets, but the experiment does not establish its superiority over the current multiclass approach.
+
+These are development estimates, not final test results. Confidence intervals assume independent messages, although near-duplicates exist in Banking77.
+
+### Quick Mode
+
+The script also supports `--quick`, using 3 outer folds and 2 inner folds. This mode is intended for faster execution and pipeline checks. Its results are not used as the primary experimental evidence.
+
+**Reproducibility:**
+
+```bash
+python scripts/nested_cv_detectors.py
+python scripts/nested_cv_detectors.py --quick
+```
+
+The final test split remains untouched and must only be evaluated using the frozen test protocol.
+
+
+## Manual Error Analysis
+
+A manual analysis was conducted on the validation misclassifications following a Karpathy-style error categorization process.
+
+A total of **110 validation errors** were manually labelled across eight categories.
+
+### Overall Error Distribution
+
+| Error type | Count |
+|---|---:|
+| label_ambiguity | 34 |
+| vague_or_short | 33 |
+| multi_intent | 10 |
+| negation | 10 |
+| vocabulary_gap | 9 |
+| word_form | 8 |
+| typo | 3 |
+| other | 3 |
+| **Total** | **110** |
+
+### Security-Relevant Errors
+
+Among the 110 errors, 14 were security-relevant.
+
+| Error type | Count |
+|---|---:|
+| label_ambiguity | 7 |
+| negation | 3 |
+| vague_or_short | 2 |
+| other | 1 |
+| word_form | 1 |
+| **Total** | **14** |
+
+### Main Findings
+
+- Label ambiguity and short or vague messages account for 60.9% of all observed errors.
+- Security-relevant errors are also predominantly associated with label ambiguity.
+- Negation and word-form variations remain relevant challenges for security detection.
+- Only three errors were attributed to spelling mistakes.
+
+**Interpretation:** The main weaknesses are semantic overlap between intents and insufficient contextual information in customer messages, rather than spelling errors alone.
+
+The labels were assigned manually and therefore represent a human interpretation of the observed errors.
+
+
 ## How a ticket is routed
 
 ```
@@ -118,7 +222,12 @@ I looked for a free host that runs a FastAPI + scikit-learn service. On 30–31 
 
 ## Roadmap
 
-1. Review with two classmates plus a live adversarial test (messages written by them). 2. Final benchmark on the test split, once, frozen. 3. Intent-level protected detector (dedicated binary classifier with char n-grams), evaluated by nested cross-validation on data the test result did not influence. 4. Calibration audit in the 0.95–1.0 band and per protected intent; manual error analysis of validation errors. 5. Live test of the LLM fallback only if a claim is ever made about it. 6. A real host if a no-card option can be verified.
+1. Review with two classmates plus a live adversarial test using messages written by them.
+2. Final benchmark on the test split, once, using the frozen configuration.
+3. Evaluate whether the dedicated binary detector offers a meaningful improvement over the current multiclass approach.
+4. Calibration audit in the 0.95–1.0 confidence band and per protected intent.
+5. Live test of the LLM fallback only if a claim is ever made about it.
+6. A real host if a no-card option can be verified.
 
 ## Development notes
 
