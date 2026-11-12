@@ -1,0 +1,108 @@
+{
+  "date_utc": "2026-11-12T16:17:49.929458+00:00",
+  "base_url_host": "127.0.0.1:8000",
+  "split": "val",
+  "n_requested": 1962,
+  "n_ok": 1962,
+  "n_errors": 0,
+  "error_samples": [],
+  "note": "validation split was used to choose thresholds: not an independent test",
+  "route_counts": {
+    "auto": 1145,
+    "llm": 0,
+    "human": 817
+  },
+  "route_pct": {
+    "auto": 58.36,
+    "llm": 0.0,
+    "human": 41.64
+  },
+  "auto_accuracy": 0.9948,
+  "layers_all_requests": {
+    "low_confidence": 287,
+    "confidence_gate": 1145,
+    "lexical_gate": 68,
+    "probability_gate": 462
+  },
+  "layers_protected_messages": {
+    "lexical_gate": 46,
+    "probability_gate": 110
+  },
+  "protected_total": 156,
+  "protected_not_routed_to_human": 0,
+  "protected_leak_pct": 0.0,
+  "protected_leak_ci95_pct": [
+    0.0,
+    2.34
+  ],
+  "per_intent_protected": {
+    "card_payment_not_recognised": {
+      "n": 31,
+      "not_routed_to_human": 0,
+      "ci95_pct": [
+        0.0,
+        11.22
+      ]
+    },
+    "cash_withdrawal_not_recognised": {
+      "n": 30,
+      "not_routed_to_human": 0,
+      "ci95_pct": [
+        0.0,
+        11.57
+      ]
+    },
+    "compromised_card": {
+      "n": 19,
+      "not_routed_to_human": 0,
+      "ci95_pct": [
+        0.0,
+        17.65
+      ]
+    },
+    "direct_debit_payment_not_recognised": {
+      "n": 33,
+      "not_routed_to_human": 0,
+      "ci95_pct": [
+        0.0,
+        10.58
+      ]
+    },
+    "lost_or_stolen_card": {
+      "n": 19,
+      "not_routed_to_human": 0,
+      "ci95_pct": [
+        0.0,
+        17.65
+      ]
+    },
+    "lost_or_stolen_phone": {
+      "n": 24,
+      "not_routed_to_human": 0,
+      "ci95_pct": [
+        0.0,
+        14.25
+      ]
+    }
+  },
+  "git": {
+    "commit": "e4d0fbd51232fc6f1431c975ca801cee1cf5212c",
+    "uncommitted_changes": true
+  },
+  "thresholds_file": {
+    "model_artifact": "models/clf_v1.joblib",
+    "tau_protected": 0.0047,
+    "tau_confidence": 0.95,
+    "selected_on": "validation (tau_confidence); out-of-fold train (tau_protected review, 2026-10-30)",
+    "rule_tau_protected": "0.0047 kept for V1: out-of-fold train gives 3/727 leaks (0.41%, 95% upper bound ~1.06%) at 23.7% escalation; observed zero is not a guarantee; the 'half of the lowest P' rule is unusable (outlier: tau 0.0003 = 66.5% escalation)",
+    "rule_tau_confidence": "auto-tier accuracy >= 99.4% on validation (0.95 gives 99.48%, coverage 59.02%); rule written after viewing the sweep table",
+    "lexical_guard": "ACTIVE in API v0.4.0+, version lex_v2_11patterns; 4 of 11 patterns added after seeing validation leaks, so its validation numbers are optimistic"
+  },
+  "client_latency_ms": {
+    "p50": 7.23,
+    "p95": 24.92,
+    "p99": 30.11,
+    "max": 205.79,
+    "mean": 10.03
+  }
+}

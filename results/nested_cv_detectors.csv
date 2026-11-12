@@ -1,0 +1,7 @@
+detector,budget_%,protected_missed,miss_rate_%,ci95,real_escalation_%
+A multiclass (current),10,6/883,0.68,0.25-1.47%,8.2
+A multiclass (current),15,3/883,0.34,0.07-0.99%,12.2
+A multiclass (current),20,3/883,0.34,0.07-0.99%,15.9
+D binary word+char,10,8/883,0.91,0.39-1.78%,8.6
+D binary word+char,15,4/883,0.45,0.12-1.16%,13.0
+D binary word+char,20,2/883,0.23,0.03-0.82%,16.7
